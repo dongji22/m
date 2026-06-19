@@ -4,9 +4,9 @@
 
     "sites": [
         
-        
+        {"key":"DJ-Z-暴风","name":"️🌴暴风┃直连Z","type":1,"api":"https://bfzyapi.com/api.php/provide/vod/","searchable":1,"categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
+
 {"key":"DJ-Z-量子","name":"🌴量子┃直连Z","type":1,"api":"https://cj.lziapi.com/api.php/provide/vod","searchable":1,"categories": ["大陆综艺", "国产剧", "韩国剧", "欧美剧", "恐怖片","喜剧片","动作片","科幻片","爱情片", "国产动漫","电影解说","伦理片","港台综艺","纪录片"]},
-{"key":"DJ-Z-暴风","name":"️🌴暴风┃直连Z","type":1,"api":"https://bfzyapi.com/api.php/provide/vod/","searchable":1,"categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
 {"key":"DJ-Z-非凡","name":"️🌴非凡┃直连Z","type":1,"api":"https://api.ffzyapi.com/api.php/provide/vod","searchable":1,"categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
 
 {"key":"DJ-Z-虎牙","name":"️🌴虎牙┃直连Z","type":1,"api":"https://www.huyaapi.com/api.php/provide/vod","searchable":1
