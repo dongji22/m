@@ -4,11 +4,24 @@
 
     "sites": [
         
-        {"key":"DJ-Z-暴风","name":"️🌴暴风┃直连Z","type":1,"api":"https://bfzyapi.com/api.php/provide/vod/","searchable":1,"categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
+        {"key":"DJ-Z-暴风","name":"️🌴暴风┃直连Z","type":1,"api":"https://bfzyapi.com/api.php/provide/vod/","searchable":1,
+		 "categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
 
-{"key":"DJ-Z-量子","name":"🌴量子┃直连Z","type":1,"api":"https://cj.lziapi.com/api.php/provide/vod","searchable":1,"categories": ["大陆综艺", "国产剧", "韩国剧", "欧美剧", "恐怖片","喜剧片","动作片","科幻片","爱情片", "国产动漫","电影解说","伦理片","港台综艺","纪录片"]},
-{"key":"DJ-Z-非凡","name":"️🌴非凡┃直连Z","type":1,"api":"https://api.ffzyapi.com/api.php/provide/vod","searchable":1,"categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
+{"key":"DJ-Z-量子","name":"🌴量子┃直连Z","type":1,"api":"https://cj.lziapi.com/api.php/provide/vod","searchable":1,
+ "categories": ["大陆综艺", "国产剧", "韩国剧", "欧美剧", "恐怖片","喜剧片","动作片","科幻片","爱情片", "国产动漫","电影解说","伦理片","港台综艺","纪录片"]},
+{"key":"DJ-Z-非凡","name":"️🌴非凡┃直连Z","type":1,"api":"https://api.ffzyapi.com/api.php/provide/vod","searchable":1,
+ "categories":["大陆综艺","国产剧","国产动漫","记录片","韩国剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
 
+{"key":"电影天堂","name":"电影天堂|CJ","type":1,"api":"http://caiji.dyttzyapi.com/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"如意资源","name":"如意|CJ","type":1,"api":"https://cj.rycjapi.com/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"电影天堂","name":"电影天堂|CJ","type":1,"api":"http://caiji.dyttzyapi.com/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"光影资源","name":"光影|CJ","type":1,"api":"https://api.guangsuapi.com/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":["电影","电视剧","综艺","动漫","动作片","喜剧片","爱情片","科幻片","剧情片","恐怖片","战争片","大陆剧","欧美剧","港澳剧","韩剧","动漫电影","日剧","台湾剧","泰剧","记录片","体育赛事","短剧","预告片","足球","篮球","台球","其他赛事"]},
+		{"key":"爱奇艺资源","name":"爱奇艺|CJ","type":1,"api":"https://iqiyizyapi.com/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":["国产动漫","日韩动漫","欧美动漫","港台动漫","动漫电影","动漫","电影","动作片","喜剧片","爱情片","科幻片","恐怖片","剧情片","战争片","惊悚片","家庭片","古装片","历史片","悬疑片","犯罪片","灾难片","记录片","短片","连续剧","国产剧","香港剧","韩国剧","欧美剧","台湾剧","日本剧","海外剧","泰国剧","综艺","大陆综艺","港台综艺","日韩综艺","欧美综艺","短剧"]},
+		{"key":"茅台资源","name":"茅台|CJ","type":1,"api":"https://caiji.maotaizy.cc/api.php/provide/vod/","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"淘片资源","name":"淘片|CJ","type":1,"api":"https://www.taopianzy.com/cjapi/mc/vod/json","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"金鹰资源","name":"金鹰|CJ","type":1,"api":"https://jyzyapi.com/provide/vod","searchable":1,"quickSearch":1,"categories":[]},
+		{"key":"影剧资源","name":"影剧|CJ","type":1,"api":"https://caiji.maotaizy.cc/api.php/provide/vod/at/josn/","searchable":1,"quickSearch":1,"categories":[]},
+		
 {"key":"DJ-Z-虎牙","name":"️🌴虎牙┃直连Z","type":1,"api":"https://www.huyaapi.com/api.php/provide/vod","searchable":1
 ,"categories":["综艺","内地剧","记录片","韩剧","香港剧","台湾剧","欧美剧","动作片","科幻片","战争片","奇幻片","喜剧片","爱情片","恐怖片","犯罪片","悬疑片","惊悚片","剧情片","冒险片"]},
 {"key":"DJ-Z-优质","name":"️🌴优质┃直连Z","type":1,"api":"https://api.yyzy-tv.vip/inc/apijson.php?ac=list","searchable":1
