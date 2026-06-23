@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英语单词背诵工具 - 多标签切换</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+        }
+        :root {
+            --bg: #f7f9fc;
+            --card: #ffffff;
+            --text: #222;
+            --sub-text: #666;
+            --primary: #4080ff;
+            --border: #e5e7eb;
+            --danger: #ff5555;
+            --success: #28c76f;
+            --tab-active: #4080ff;
+            --tab-bg: #eef4ff;
+        }
+        .dark {
+            --bg: #1a1d24;
+            --card: #272b33;
+            --text: #f0f0f0;
+            --sub-text: #b0b0b0;
+            --border: #3a3f48;
+            --tab-bg: #2c3644;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        /* 顶部标签导航 */
+        .tab-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 10px 16px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: var(--tab-bg);
+            border-bottom: 2px solid var(--tab-active);
+            font-weight: bold;
+        }
+        /* 模块容器，默认隐藏 */
+        .tab-panel {
+            display: none;
+        }
+        .tab-panel.show {
+            display: block;
+        }
+        .word-card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 40px 30px;
+            text-align: center;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            min-height: 260px;
+        }
+        .word-en {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .word-cn {
+            font-size: 22px;
+            color: var(--sub-text);
+            transition: opacity 0.3s;
+        }
+        .hide-cn {
+            opacity: 0;
+        }
+        .control-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .input-box, .write-box, .ocr-box, .book-box, .print-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            resize: vertical;
+            margin: 10px 0;
+        }
+        .tip {
+            font-size: 13px;
+            color: var(--sub-text);
+            margin-bottom: 10px;
+        }
+        .progress {
+            text-align: center;
+            margin: 10px 0;
+            color: var(--sub-text);
+        }
+        .speed-box, .read-count-box, .grade-box, .print-set-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        input[type="range"] {
+            width: 200px;
+        }
+        select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        /* 默写样式 */
+        .write-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #writeInput {
+            width: 80%;
+            font-size: 26px;
+            text-align: center;
+            padding: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            letter-spacing: 6px;
+            display:block;
+            margin:0 auto;
+        }
+        .char-green {
+            color: var(--success);
+        }
+        .char-red {
+            color: var(--danger);
+        }
+        .preview-text {
+            font-size: 32px;
+            letter-spacing: 8px;
+            margin: 15px 0;
+            min-height: 40px;
+            text-align:center;
+        }
+        .write-tip {
+            margin-top: 10px;
+            font-size: 18px;
+            text-align:center;
+            font-weight:500;
+        }
+        /* OCR拍照 */
+        #video {
+            max-width: 100%;
+            max-height: 300px;
+            border:1px solid var(--border);
+            border-radius:8px;
+            margin:10px auto;
+            display:block;
+        }
+        #canvas {
+            display:none;
+        }
+        #fileInput {
+            display:none;
+        }
+        /* 课本导入模块 */
+        .book-title {
+            text-align:center;
+            font-size:18px;
+            margin-bottom:15px;
+        }
+        /* 打印模块 */
+        .print-title {
+            text-align:center;
+            font-size:18px;
+            margin-bottom:15px;
+        }
+        #printPreview {
+            border:1px solid var(--border);
+            padding:20px;
+            min-height:300px;
+            margin:15px 0;
+        }
+        .print-word-item {
+            margin:6px 0;
+        }
+        /* 打印专用样式 打印时生效 */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printPreview, #printPreview * {
+                visibility: visible;
+            }
+            #printPreview {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 210mm;
+                padding: 15mm;
+                border:none;
+            }
+            @page {
+                size: A4;
+                margin: 15mm;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>📖 英语单词背诵工具</h1>
+        <button class="btn btn-outline" id="themeBtn">切换深色模式</button>
+    </header>
+
+    <!-- 顶部标签切换导航 新增打印单词库标签 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="tab-browse">单词浏览背诵</button>
+        <button class="tab-btn" data-tab="tab-write">发音默写模式</button>
+        <button class="tab-btn" data-tab="tab-book">课本词库自动导入</button>
+        <button class="tab-btn" data-tab="tab-ocr">拍照识别导入</button>
+        <button class="tab-btn" data-tab="tab-edit">单词库编辑</button>
+        <button class="tab-btn" data-tab="tab-print">打印单词库</button>
+    </div>
+
+    <!-- 面板1：单词浏览背诵 -->
+    <div class="tab-panel show" id="tab-browse">
+        <div class="progress" id="progressText">暂无单词，请录入词汇</div>
+        <div class="word-card">
+            <div class="word-en" id="enWord">请先添加单词</div>
+            <div class="word-cn hide-cn" id="cnWord">释义会显示在这里</div>
+        </div>
+        <div class="speed-box">
+            <span>朗读语速：0.5</span>
+            <input type="range" id="rateSlider" min="0.5" max="2" step="0.1" value="1">
+            <span>2.0</span>
+            <span id="rateText">当前：1.0</span>
+        </div>
+        <div class="read-count-box">
+            <span>单次朗读次数：</span>
+            <select id="browseReadCount">
+                <option value="1">1遍</option>
+                <option value="2">2遍</option>
+                <option value="3">3遍</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <button class="btn btn-primary" id="prevBtn">上一个</button>
+            <button class="btn btn-primary" id="nextBtn">下一个</button>
+            <button class="btn btn-outline" id="showMeanBtn">显示/隐藏释义</button>
+            <button class="btn btn-outline" id="randomBtn">随机打乱</button>
+            <button class="btn btn-primary" id="readBtn">朗读当前单词</button>
+            <button class="btn btn-danger" id="autoReadBtn">自动循环朗读</button>
+            <button class="btn btn-outline" id="stopReadBtn">停止朗读</button>
+        </div>
+    </div>
+
+    <!-- 面板2：发音默写 -->
+    <div class="tab-panel" id="tab-write">
+        <div class="write-box">
+            <div class="write-title">✍️ 听发音默写单词</div>
+            <div class="read-count-box">
+                <span>单词朗读次数：</span>
+                <select id="writeReadCount">
+                    <option value="1">1遍</option>
+                    <option value="2">2遍</option>
+                    <option value="3">3遍</option>
+                </select>
+            </div>
+            <div class="control-row">
+                <button class="btn btn-primary" id="startWriteBtn">开始默写当前单词</button>
+                <button class="btn btn-outline" id="reSpeakBtn">重听发音</button>
+            </div>
+            <div class="preview-text" id="charPreview"></div>
+            <input type="text" id="writeInput" placeholder="听完发音输入单词，回车提交">
+            <div class="control-row" style="margin-top:15px">
+                <button class="btn btn-success" id="submitWriteBtn">提交答案</button>
+            </div>
+            <div class="write-tip" id="writeTip"></div>
+        </div>
+    </div>
+
+    <!-- 面板3：课本词库自动导入 -->
+    <div class="tab-panel" id="tab-book">
+        <div class="book-box">
+            <div class="book-title">📚 中小学课本单元单词一键导入</div>
+            <div class="grade-box">
+                <span>学段年级：</span>
+                <select id="gradeSelect">
+                    <option value="">请选择年级</option>
+                    <option value="p3">小学三年级</option>
+                    <option value="p4">小学四年级</option>
+                    <option value="p5">小学五年级</option>
+                    <option value="p6">小学六年级</option>
+                    <option value="m7">初中七年级</option>
+                    <option value="m8">初中八年级</option>
+                    <option value="m9">初中九年级</option>
+                    <option value="h1">高中必修一</option>
+                    <option value="h2">高中必修二</option>
+                    <option value="h3">高中必修三</option>
+                    <option value="h4">高中必修四</option>
+                    <option value="h5">高中必修五</option>
+                </select>
+                <span>单元：</span>
+                <select id="unitSelect">
+                    <option value="">先选择年级</option>
+                </select>
+            </div>
+            <div class="control-row" style="margin:20px 0;">
+                <button class="btn btn-primary" id="loadBookWordBtn">导入本单元全部单词词组句子</button>
+                <button class="btn btn-outline" id="clearBookTempBtn">清空待导入内容</button>
+            </div>
+            <div class="tip">预览待导入单词（可手动增删修改）：</div>
+            <textarea id="bookPreviewArea" readonly style="min-height:160px;"></textarea>
+            <div class="tip">点击导入后内容会追加到单词编辑面板，切换到「单词库编辑」保存即可背诵</div>
+        </div>
+    </div>
+
+    <!-- 面板4：拍照OCR识别 -->
+    <div class="tab-panel" id="tab-ocr">
+        <div class="ocr-box">
+            <h3 style="text-align:center;margin-bottom:15px">📷 拍照/相册图片批量导入单词</h3>
+            <div class="control-row">
+                <button class="btn btn-primary" id="openCamBtn">打开相机拍照</button>
+                <button class="btn btn-outline" id="uploadImgBtn">上传本地图片</button>
+                <input type="file" id="fileInput" accept="image/*">
+                <button class="btn btn-success" id="ocrSaveBtn">填入单词编辑框</button>
+            </div>
+            <video id="video" autoplay muted playsinline></video>
+            <canvas id="canvas"></canvas>
+            <div class="tip">识别结果：</div>
+            <textarea id="ocrTextResult" readonly placeholder="拍照/上传图片后识别文字会显示在此"></textarea>
+            <div class="tip">格式要求：每行 英文,中文，识别后手动修正再保存词库</div>
+        </div>
+    </div>
+
+    <!-- 面板5：单词库编辑 -->
+    <div class="tab-panel" id="tab-edit">
+        <div class="input-box">
+            <div class="tip">格式：一行一个，英文,中文 逗号为英文逗号<br>示例：apple,苹果</div>
+            <textarea id="wordInput" placeholder="粘贴或输入单词列表..."></textarea>
+            <div class="control-row">
+                <button class="btn btn-primary" id="saveWordBtn">保存单词库</button>
+                <button class="btn btn-outline" id="clearWordBtn">清空全部单词</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 面板6：打印单词库【新增】 -->
+    <div class="tab-panel" id="tab-print">
+        <div class="print-box">
+            <div class="print-title">🖨️ A4单词打印设置</div>
+            <div class="print-set-box">
+                <span>文字主题颜色：</span>
+                <select id="printColorTheme">
+                    <option value="#000000">标准黑色</option>
+                    <option value="#444444">护眼浅灰</option>
+                    <option value="#1967d2">清爽蓝色</option>
+                </select>
+                <span>字体大小：</span>
+                <select id="printFontSize">
+                    <option value="14px">小号14px</option>
+                    <option value="18px" selected>标准18px</option>
+                    <option value="22px">大号22px</option>
+                </select>
+                <label><input type="checkbox" id="printShowCn" checked>打印中文释义</label>
+            </div>
+            <div class="control-row">
+                <button class="btn btn-primary" id="refreshPrintBtn">刷新打印预览</button>
+                <button class="btn btn-success" id="doPrintBtn">直接打印(A4)</button>
+            </div>
+            <div class="tip">打印预览（下方内容会完整打印在A4纸上）：</div>
+            <div id="printPreview"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========== 内置中小学单元词库数据（单词+词组+短句）==========
+const bookWordData = {
+    p3: {
+        unit1: `apple,苹果
+banana,香蕉
+orange,橙子
+pear,梨
+I like apples.,我喜欢苹果`,
+        unit2: `cat,猫
+dog,狗
+bird,小鸟
+tiger,老虎
+This is a dog.,这是一只小狗`
+    },
+    p4: {
+        unit1: `school,学校
+teacher,老师
+student,学生
+classroom,教室
+Welcome to school.,欢迎来到学校`,
+        unit2: `book,书本
+pen,钢笔
+pencil,铅笔
+bag,书包
+My bag is blue.,我的书包是蓝色的`
+    },
+    p5: {
+        unit1: `Monday,周一
+Tuesday,周二
+Friday,周五
+weekend,周末
+I read books on weekend.,我周末看书`,
+        unit2: `rice,米饭
+noodle,面条
+egg,鸡蛋
+milk,牛奶
+I drink milk every day.,我每天喝牛奶`
+    },
+    p6: {
+        unit1: `father,父亲
+mother,母亲
+brother,兄弟
+sister,姐妹
+This is my family.,这是我的家庭`,
+        unit2: `spring,春天
+summer,夏天
+autumn,秋天
+winter,冬天
+I love spring.,我喜欢春天`
+    },
+    m7: {
+        unit1: `name,名字
+nice,美好的
+meet,遇见
+friend,朋友
+Nice to meet you.,很高兴认识你`,
+        unit2: `color,颜色
+red,红色
+green,绿色
+yellow,黄色
+My favorite color is red.,我最喜欢红色`
+    },
+    m8: {
+        unit1: `healthy,健康的
+exercise,锻炼
+sleep,睡觉
+habit,习惯
+Keep healthy every day.,每天保持健康`,
+        unit2: `travel,旅行
+plane,飞机
+train,火车
+trip,旅途
+I want to travel.,我想去旅行`
+    },
+    m9: {
+        unit1: `pollute,污染
+environment,环境
+recycle,回收
+protect,保护
+Protect our earth.,保护我们的地球`,
+        unit2: `history,历史
+culture,文化
+ancient,古老的
+tradition,传统
+Chinese culture is great.,中华文化博大精深`
+    },
+    h1: {
+        unit1: `attitude,态度
+challenge,挑战
+senior,高级的
+freshman,新生
+Face the new challenge.,迎接新的挑战`,
+        unit2: `schedule,日程
+subject,科目
+chemistry,化学
+biology,生物
+I like biology best.,我最喜欢生物`
+    },
+    h2: {
+        unit1: `invent,发明
+invention,发明物
+robot,机器人
+machine,机器
+Robot can help people.,机器人可以帮助人类`,
+        unit2: `transport,交通
+subway,地铁
+highway,公路
+vehicle,交通工具
+Public transport is convenient.,公共交通很便利`
+    },
+    h3: {
+        unit1: `climate,气候
+resource,资源
+desert,沙漠
+forest,森林
+Save natural resources.,节约自然资源`,
+        unit2: `custom,习俗
+festival,节日
+ceremony,仪式
+celebrate,庆祝
+We celebrate Spring Festival.,我们庆祝春节`
+    },
+    h4: {
+        unit1: `emotion,情绪
+anxious,焦虑的
+relax,放松
+pressure,压力
+Relax yourself under pressure.,压力下学会放松`,
+        unit2: `industry,工业
+produce,生产
+material,材料
+factory,工厂
+This factory produces toys.,这家工厂生产玩具`
+    },
+    h5: {
+        unit1: `analyse,分析
+conclude,总结
+evidence,证据
+theory,理论
+Analyse the data carefully.,仔细分析数据`,
+        unit2: `literature,文学
+poem,诗歌
+novel,小说
+writer,作家
+I enjoy reading literature.,我喜爱阅读文学作品`
+    }
+};
+
+// ========== 标签切换逻辑 ==========
+const tabBtns = document.querySelectorAll('.tab-btn');
+const tabPanels = document.querySelectorAll('.tab-panel');
+tabBtns.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        const targetTab = btn.dataset.tab;
+        tabBtns.forEach(b=>b.classList.remove('active'));
+        tabPanels.forEach(p=>p.classList.remove('show'));
+        btn.classList.add('active');
+        document.getElementById(targetTab).classList.add('show');
+        // 切换到打印标签自动刷新预览
+        if(targetTab === 'tab-print') refreshPrintPreview();
+    })
+})
+
+// DOM基础元素
+const themeBtn = document.getElementById('themeBtn');
+const enWord = document.getElementById('enWord');
+const cnWord = document.getElementById('cnWord');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const showMeanBtn = document.getElementById('showMeanBtn');
+const randomBtn = document.getElementById('randomBtn');
+const wordInput = document.getElementById('wordInput');
+const saveWordBtn = document.getElementById('saveWordBtn');
+const clearWordBtn = document.getElementById('clearWordBtn');
+const progressText = document.getElementById('progressText');
+const readBtn = document.getElementById('readBtn');
+const autoReadBtn = document.getElementById('autoReadBtn');
+const stopReadBtn = document.getElementById('stopReadBtn');
+const rateSlider = document.getElementById('rateSlider');
+const rateText = document.getElementById('rateText');
+const browseReadCount = document.getElementById('browseReadCount');
+
+// 默写模块
+const startWriteBtn = document.getElementById('startWriteBtn');
+const writeInput = document.getElementById('writeInput');
+const charPreview = document.getElementById('charPreview');
+const reSpeakBtn = document.getElementById('reSpeakBtn');
+const submitWriteBtn = document.getElementById('submitWriteBtn');
+const writeTip = document.getElementById('writeTip');
+const writeReadCount = document.getElementById('writeReadCount');
+
+// 课本导入模块DOM
+const gradeSelect = document.getElementById('gradeSelect');
+const unitSelect = document.getElementById('unitSelect');
+const bookPreviewArea = document.getElementById('bookPreviewArea');
+const loadBookWordBtn = document.getElementById('loadBookWordBtn');
+const clearBookTempBtn = document.getElementById('clearBookTempBtn');
+
+// 打印模块DOM【新增】
+const printPreview = document.getElementById('printPreview');
+const printColorTheme = document.getElementById('printColorTheme');
+const printFontSize = document.getElementById('printFontSize');
+const printShowCn = document.getElementById('printShowCn');
+const refreshPrintBtn = document.getElementById('refreshPrintBtn');
+const doPrintBtn = document.getElementById('doPrintBtn');
+
+// OCR拍照
+const openCamBtn = document.getElementById('openCamBtn');
+const uploadImgBtn = document.getElementById('uploadImgBtn');
+const fileInput = document.getElementById('fileInput');
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const ocrTextResult = document.getElementById('ocrTextResult');
+const ocrSaveBtn = document.getElementById('ocrSaveBtn');
+let mediaStream = null;
+
+// 全局变量
+let wordList = [];
+let currentIndex = 0;
+let meanHide = true;
+let autoReadTimer = null;
+let readRate = 1;
+let targetWord = "";
+let isWritingMode = false;
+let currentBookText = "";
+
+// 本地存储
+function loadLocalData() {
+    const saveData = localStorage.getItem('wordBook');
+    if (saveData) {
+        wordList = JSON.parse(saveData);
+        renderWordInput();
+        refreshWordShow();
+    }
+}
+function saveLocalData() {
+    localStorage.setItem('wordBook', JSON.stringify(wordList));
+}
+function renderWordInput() {
+    let str = '';
+    wordList.forEach(item => str += `${item.en},${item.cn}\n`);
+    wordInput.value = str.trim();
+}
+function refreshWordShow() {
+    if (wordList.length === 0) {
+        enWord.innerText = '请先添加单词';
+        cnWord.innerText = '释义会显示在这里';
+        progressText.innerText = '暂无单词，请录入词汇';
+        return;
+    }
+    const word = wordList[currentIndex];
+    enWord.innerText = word.en;
+    cnWord.innerText = word.cn;
+    progressText.innerText = `当前 ${currentIndex + 1} / 共 ${wordList.length} 个单词`;
+    cnWord.classList.toggle('hide-cn', meanHide);
+}
+function parseWords(text) {
+    const lines = text.split('\n').filter(l => l.trim());
+    const arr = [];
+    lines.forEach(line => {
+        const sp = line.split(',');
+        if(sp.length >=2) arr.push({en:sp[0].trim(), cn:sp[1].trim()});
+    });
+    return arr;
+}
+
+// 循环朗读单词 n遍
+function speakWordLoop(text, count) {
+    window.speechSynthesis.cancel();
+    let i = 0;
+    function speakOnce() {
+        if(i >= count) return;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'en-US';
+        utter.rate = readRate;
+        utter.onend = ()=>{
+            i++;
+            setTimeout(speakOnce, 600);
+        }
+        window.speechSynthesis.speak(utter);
+    }
+    speakOnce();
+}
+// 浏览页朗读当前单词
+function readCurrent() {
+    if(wordList.length === 0) return;
+    const cnt = Number(browseReadCount.value);
+    speakWordLoop(wordList[currentIndex].en, cnt);
+}
+// 默写页朗读目标单词
+function readWriteWord() {
+    if(!targetWord) return;
+    const cnt = Number(writeReadCount.value);
+    speakWordLoop(targetWord, cnt);
+}
+function stopAllRead() {
+    window.speechSynthesis.cancel();
+    if(autoReadTimer) clearInterval(autoReadTimer);
+    autoReadTimer = null;
+}
+function startAutoRead() {
+    stopAllRead();
+    meanHide = true;
+    refreshWordShow();
+    readCurrent();
+    autoReadTimer = setInterval(()=>{
+        currentIndex = (currentIndex +1) % wordList.length;
+        refreshWordShow();
+        readCurrent();
+    }, 3000);
+}
+
+// 默写渲染字母颜色
+function renderCharPreview(inputStr, target) {
+    charPreview.innerHTML = "";
+    const inputLower = inputStr.toLowerCase();
+    const targetLower = target.toLowerCase();
+    for(let i=0; i<inputStr.length; i++){
+        const span = document.createElement('span');
+        span.textContent = inputStr[i];
+        if(i < targetLower.length && inputLower[i] === targetLower[i]){
+            span.className = "char-green";
+        }else{
+            span.className = "char-red";
+        }
+        charPreview.appendChild(span);
+    }
+}
+function startWrite() {
+    if(wordList.length ===0) return;
+    stopAllRead();
+    isWritingMode = true;
+    const word = wordList[currentIndex];
+    targetWord = word.en;
+    writeInput.value = "";
+    charPreview.innerHTML = "";
+    writeTip.textContent = "";
+    writeInput.focus();
+    readWriteWord();
+    meanHide = true;
+    refreshWordShow();
+}
+function submitAnswer() {
+    if(!isWritingMode || !targetWord) return;
+    const userAns = writeInput.value.trim().toLowerCase();
+    const realAns = targetWord.toLowerCase();
+    if(userAns === realAns){
+        writeTip.style.color = "var(--success)";
+        writeTip.textContent = `正确！${targetWord} 释义：${wordList[currentIndex].cn}，按回车切换下一个`;
+        isWritingMode = false;
+    }else{
+        writeTip.style.color = "var(--danger)";
+        writeTip.textContent = "拼写错误，可重听发音重新输入，回车提交";
+    }
+}
+// 答对后切换下一个默写单词
+function nextWriteWord() {
+    if(isWritingMode) return;
+    if(wordList.length===0) return;
+    currentIndex = (currentIndex+1) % wordList.length;
+    refreshWordShow();
+    writeInput.value="";
+    charPreview.innerHTML="";
+    writeTip.textContent="";
+    startWrite();
+}
+
+// ==================== 打印模块逻辑 ====================
+function refreshPrintPreview(){
+    const color = printColorTheme.value;
+    const fontSize = printFontSize.value;
+    const showCn = printShowCn.checked;
+    printPreview.innerHTML = "";
+    if(wordList.length === 0){
+        printPreview.innerHTML = "<div style='text-align:center;padding:40px;color:#999'>暂无单词，请先录入单词库</div>";
+        return;
+    }
+    // 标题
+    const title = document.createElement('h3');
+    title.style.color = color;
+    title.style.fontSize = "24px";
+    title.style.textAlign = "center";
+    title.style.marginBottom = "20px";
+    title.innerText = "英语单词列表";
+    printPreview.appendChild(title);
+    // 遍历单词
+    wordList.forEach(item=>{
+        const div = document.createElement('div');
+        div.className = "print-word-item";
+        div.style.color = color;
+        div.style.fontSize = fontSize;
+        let text = item.en;
+        if(showCn) text += " —— " + item.cn;
+        div.innerText = text;
+        printPreview.appendChild(div);
+    })
+}
+// 打印按钮
+doPrintBtn.addEventListener('click', function(){
+    if(wordList.length === 0){
+        alert("单词库为空，无法打印");
+        return;
+    }
+    window.print();
+})
+// 刷新预览
+refreshPrintBtn.addEventListener('click', refreshPrintPreview);
+// 修改设置自动刷新预览
+printColorTheme.addEventListener('change', refreshPrintPreview);
+printFontSize.addEventListener('change', refreshPrintPreview);
+printShowCn.addEventListener('change', refreshPrintPreview);
+
+// ==================== 课本词库导入逻辑 ====================
+gradeSelect.addEventListener('change', function(){
+    const grade = this.value;
+    unitSelect.innerHTML = "";
+    bookPreviewArea.value = "";
+    currentBookText = "";
+    if(!grade) {
+        unitSelect.innerHTML = `<option value="">先选择年级</option>`;
+        return;
+    }
+    const units = Object.keys(bookWordData[grade]);
+    units.forEach(u=>{
+        const opt = document.createElement('option');
+        opt.value = u;
+        opt.innerText = `Unit ${u.replace('unit','')}`;
+        unitSelect.appendChild(opt);
+    })
+})
+unitSelect.addEventListener('change', function(){
+    const grade = gradeSelect.value;
+    const unit = this.value;
+    if(!grade || !unit) return;
+    currentBookText = bookWordData[grade][unit];
+    bookPreviewArea.value = currentBookText;
+})
+loadBookWordBtn.addEventListener('click', function(){
+    if(!currentBookText) return alert("请先选择年级和单元");
+    wordInput.value += "\n" + currentBookText;
+    alert("本单元单词已追加至单词编辑面板，切换到「单词库编辑」保存即可！");
+})
+clearBookTempBtn.addEventListener('click', function(){
+    currentBookText = "";
+    bookPreviewArea.value = "";
+})
+
+// OCR相机识别
+async function openCamera() {
+    try {
+        if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
+        mediaStream = await navigator.mediaDevices.getUserMedia({video: { facingMode: 'environment' }});
+        video.srcObject = mediaStream;
+        video.style.display = "block";
+        setTimeout(()=>takePhoto(), 1500);
+    } catch (err) {
+        alert("无法打开相机，请上传图片识别");
+    }
+}
+async function takePhoto() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video,0,0);
+    const imgData = canvas.toDataURL('image/png');
+    await ocrRecognize(imgData);
+    if(mediaStream) mediaStream.getTracks().forEach(t=>t.stop());
+    video.style.display = "none";
+}
+async function ocrRecognize(imageSrc) {
+    ocrTextResult.value = "正在识别文字，请稍等...";
+    try {
+        const result = await Tesseract.recognize(imageSrc, 'eng+chi_sim');
+        ocrTextResult.value = result.data.text;
+    } catch(e) {
+        ocrTextResult.value = "识别失败，请换清晰图片";
+    }
+}
+uploadImgBtn.onclick = ()=>fileInput.click();
+fileInput.onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = async ev=>await ocrRecognize(ev.target.result);
+    reader.readAsDataURL(file);
+}
+ocrSaveBtn.onclick = ()=>{
+    const txt = ocrTextResult.value.trim();
+    if(!txt) return alert("无识别文字");
+    wordInput.value += "\n"+txt;
+    alert("识别内容已填入单词编辑面板，切换到单词库编辑检查格式保存");
+}
+
+// 基础事件：显示/隐藏释义
+showMeanBtn.addEventListener('click', ()=>{
+    meanHide = !meanHide;
+    refreshWordShow();
+});
+
+prevBtn.addEventListener('click', ()=>{
+    if(wordList.length===0) return;
+    currentIndex = currentIndex -1 <0 ? wordList.length-1 : currentIndex-1;
+    refreshWordShow();stopAllRead();
+});
+nextBtn.addEventListener('click', ()=>{
+    if(isWritingMode){writeTip.textContent="请先答对当前默写单词";return;}
+    if(wordList.length===0) return;
+    currentIndex = (currentIndex+1)%wordList.length;
+    refreshWordShow();stopAllRead();
+    writeInput.value="";charPreview.innerHTML="";writeTip.textContent="";
+});
+randomBtn.addEventListener('click', ()=>{
+    if(wordList.length<=1) return;
+    wordList.sort(()=>Math.random()-0.5);
+    currentIndex=0;saveLocalData();renderWordInput();refreshWordShow();stopAllRead();
+    writeInput.value="";charPreview.innerHTML="";writeTip.textContent="";
+});
+saveWordBtn.addEventListener('click', ()=>{
+    stopAllRead();
+    wordList = parseWords(wordInput.value);
+    currentIndex=0;saveLocalData();refreshWordShow();
+    alert(`成功导入 ${wordList.length} 个单词/短句！`);
+});
+clearWordBtn.addEventListener('click', ()=>{
+    if(!confirm('清空所有单词？')) return;
+    stopAllRead();wordList=[];currentIndex=0;wordInput.value="";
+    saveLocalData();refreshWordShow();
+    writeInput.value="";charPreview.innerHTML="";writeTip.textContent="";
+    ocrTextResult.value="";
+    refreshPrintPreview();
+});
+themeBtn.addEventListener('click', ()=>{
+    document.body.classList.toggle('dark');
+    themeBtn.innerText = document.body.classList.contains('dark') ? "切换浅色模式" : "切换深色模式";
+});
+readBtn.addEventListener('click', readCurrent);
+autoReadBtn.addEventListener('click', startAutoRead);
+stopReadBtn.addEventListener('click', stopAllRead);
+rateSlider.addEventListener('input', function(){
+    readRate = parseFloat(this.value);
+    rateText.textContent = `当前：${readRate.toFixed(1)}`;
+});
+
+// 默写事件
+startWriteBtn.addEventListener('click', startWrite);
+reSpeakBtn.addEventListener('click', readWriteWord);
+writeInput.addEventListener('input', function(){renderCharPreview(this.value, targetWord)});
+submitWriteBtn.addEventListener('click', submitAnswer);
+
+// 默写输入框回车逻辑
+writeInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+        if(!isWritingMode){
+            nextWriteWord();
+        }else{
+            submitAnswer();
+        }
+    }
+});
+
+// OCR按钮
+openCamBtn.onclick = openCamera;
+
+window.onload = function(){
+    loadLocalData();
+    refreshPrintPreview();
+}
+</script>
+</body>
+</html>
