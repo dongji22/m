@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>假期每日学习打卡表</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft Yahei", sans-serif;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+        body {
+            padding: 20px;
+            background: #fff;
+        }
+        .top-bar {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        button {
+            padding: 8px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+        .print-btn {
+            background: #2e9940;
+            color: white;
+        }
+        .save-img-btn {
+            background: #4096ff;
+            color: white;
+        }
+        .tip-text {
+            color:#666;
+            font-size:14px;
+        }
+        h1 {
+            text-align: center;
+            color: #2e9940;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .name-line {
+            text-align: right;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+        .name-line input {
+            border: none;
+            border-bottom: 1px solid #000;
+            width: 220px;
+            font-size: 24px;
+            outline: none;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid #999;
+        }
+        td, th {
+            border: 1px solid #999;
+            text-align: center;
+            padding: 4px 2px;
+            font-size: 14px;
+            height: 36px;
+            vertical-align: middle;
+        }
+        .col-time {
+            width: 75px;
+            background: #eeeeee;
+            font-weight: bold;
+            position: relative; /* 悬浮加号定位 */
+        }
+        .col-content {
+            width: 180px;
+            background: #f8f8f8;
+        }
+        /* 日期列背景色 */
+        .color1 { background: #ffdddd; } /* 1-3 浅红 */
+        .color2 { background: #fffebb; } /* 4-10 浅黄 */
+        .color3 { background: #e6f7ff; } /* 11-18 浅蓝 */
+        .color4 { background: #d9ffd9; } /* 19-24 浅绿 */
+        .color5 { background: #f8e6ff; } /* 25-31 浅紫 */
+        /* 学科单元格底色 */
+        .subject-cell {
+            background:#d4edda;
+            font-weight:bold;
+            font-size:18px;
+            position: relative;
+        }
+        /* 悬浮加号按钮 */
+        .add-row-hover-btn {
+            position: absolute;
+            left: 4px;
+            bottom: 4px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #2e9940;
+            color: white;
+            font-size: 16px;
+            line-height: 22px;
+            text-align: center;
+            cursor: pointer;
+            display: none;
+            z-index: 10;
+        }
+        .subject-cell:hover .add-row-hover-btn {
+            display: block;
+        }
+        .editable {
+            cursor: text;
+        }
+        .editable:focus {
+            background: #fff;
+            outline: 1px solid #2e9940;
+        }
+        /* 截图容器 */
+        #captureDom {
+            padding: 10px;
+        }
+        /* 打印样式 */
+        @media print {
+            .top-bar, .add-row-hover-btn {
+                display: none !important;
+            }
+            body {
+                padding: 0;
+            }
+            tr, td, th {
+                page-break-inside: avoid !important;
+            }
+            .color1 { background-color: #ffdddd !important; }
+            .color2 { background-color: #fffebb !important; }
+            .color3 { background-color: #e6f7ff !important; }
+            .color4 { background-color: #d9ffd9 !important; }
+            .color5 { background-color: #f8e6ff !important; }
+            .subject-cell { background-color:#d4edda !important; }
+            .col-time { background-color: #eee !important; }
+            .col-content { background-color: #f8f8f8 !important; }
+            @page {
+                size: A4;
+                margin: 10mm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <button class="print-btn" onclick="window.print()">打印打卡表</button>
+        <button class="save-img-btn" onclick="saveTableAsImage()">保存为图片</button>
+        <span class="tip-text">鼠标悬浮左侧【数学/语文/英语/其他】单元格左下角出现加号，点击即可新增一行；双击左侧文字修改任务</span>
+    </div>
+
+    <div id="captureDom">
+        <h1>假期每日学习打卡表</h1>
+        <div class="name-line">姓名：<input type="text" placeholder="填写姓名"></div>
+
+        <table id="mainTable">
+            <thead>
+                <tr>
+                    <th class="col-time">时间</th>
+                    <th class="col-content">学习内容</th>
+                    <th class="color1">五<br>1</th>
+                    <th class="color1">六<br>2</th>
+                    <th class="color1">日<br>3</th>
+                    <th class="color2">一<br>4</th>
+                    <th class="color2">二<br>5</th>
+                    <th class="color2">三<br>6</th>
+                    <th class="color2">四<br>7</th>
+                    <th class="color2">五<br>8</th>
+                    <th class="color2">六<br>9</th>
+                    <th class="color2">日<br>10</th>
+                    <th class="color3">一<br>11</th>
+                    <th class="color3">二<br>12</th>
+                    <th class="color3">三<br>13</th>
+                    <th class="color3">四<br>14</th>
+                    <th class="color3">五<br>15</th>
+                    <th class="color3">六<br>16</th>
+                    <th class="color3">日<br>17</th>
+                    <th class="color4">一<br>18</th>
+                    <th class="color4">二<br>19</th>
+                    <th class="color4">三<br>20</th>
+                    <th class="color4">四<br>21</th>
+                    <th class="color4">五<br>22</th>
+                    <th class="color4">六<br>23</th>
+                    <th class="color4">日<br>24</th>
+                    <th class="color5">一<br>25</th>
+                    <th class="color5">二<br>26</th>
+                    <th class="color5">三<br>27</th>
+                    <th class="color5">四<br>28</th>
+                    <th class="color5">五<br>29</th>
+                    <th class="color5">六<br>30</th>
+                    <th class="color5">日<br>31</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- 数学区域 -->
+                <tr class="math-row subject-row">
+                    <td rowspan="4" class="subject-cell" data-type="math">
+                        数学
+                        <span class="add-row-hover-btn" onclick="addSubjectNewRow('math')">+</span>
+                    </td>
+                    <td class="editable" contenteditable="true">1.计算练习20天</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="math-row subject-row">
+                    <td class="editable" contenteditable="true">2.寒假特色作业</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="math-row subject-row">
+                    <td class="editable" contenteditable="true">3.三上专项</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="math-row subject-row">
+                    <td class="editable" contenteditable="true">4.综合练习</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+
+                <!-- 语文区域 -->
+                <tr class="chinese-row subject-row">
+                    <td rowspan="5" class="subject-cell" data-type="chinese">
+                        语文
+                        <span class="add-row-hover-btn" onclick="addSubjectNewRow('chinese')">+</span>
+                    </td>
+                    <td class="editable" contenteditable="true">1.精选字帖</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="chinese-row subject-row">
+                    <td class="editable" contenteditable="true">2.看拼音写词语</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="chinese-row subject-row">
+                    <td class="editable" contenteditable="true">3.课内背诵闯关表</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="chinese-row subject-row">
+                    <td class="editable" contenteditable="true">4.阅读集训</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="chinese-row subject-row">
+                    <td class="editable" contenteditable="true">5.语文寒假特色作业</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+
+                <!-- 英语区域 -->
+                <tr class="english-row subject-row">
+                    <td rowspan="4" class="subject-cell" data-type="english">
+                        英语
+                        <span class="add-row-hover-btn" onclick="addSubjectNewRow('english')">+</span>
+                    </td>
+                    <td class="editable" contenteditable="true">1.3B字帖+背</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="english-row subject-row">
+                    <td class="editable" contenteditable="true">2.钉钉打卡</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="english-row subject-row">
+                    <td class="editable" contenteditable="true">3.绘本阅读报告单/作业单</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="english-row subject-row">
+                    <td class="editable" contenteditable="true">4.专项练习</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+
+                <!-- 其他区域 -->
+                <tr class="other-row subject-row">
+                    <td rowspan="3" class="subject-cell" data-type="other">
+                        其他
+                        <span class="add-row-hover-btn" onclick="addSubjectNewRow('other')">+</span>
+                    </td>
+                    <td class="editable" contenteditable="true">寒假生活</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="other-row subject-row">
+                    <td class="editable" contenteditable="true">课外阅读语文/英语</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+                <tr class="other-row subject-row">
+                    <td class="editable" contenteditable="true">写日记/作文<br>背单词</td>
+                    <td class="color1"></td><td class="color1"></td><td class="color1"></td>
+                    <td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td><td class="color2"></td>
+                    <td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td><td class="color3"></td>
+                    <td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td><td class="color4"></td>
+                    <td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td><td class="color5"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 根据学科类型新增一行
+        function addSubjectNewRow(type) {
+            const rowClass = type + '-row';
+            // 获取当前学科所有行
+            const allRows = document.querySelectorAll(`.${rowClass}`);
+            const lastRow = allRows[allRows.length - 1];
+            // 复制最后一行模板
+            const newTr = lastRow.cloneNode(true);
+            // 清空可编辑文字，默认空白
+            const editCell = newTr.querySelector('.editable');
+            editCell.innerText = '';
+            // 清空所有打卡格子
+            const checkCells = newTr.querySelectorAll('.color1,.color2,.color3,.color4,.color5');
+            checkCells.forEach(cell => cell.innerText = '');
+            // 插入到当前学科最后一行后面
+            lastRow.after(newTr);
+            // 更新左侧学科单元格合并行数
+            updateSubjectRowspan(type);
+        }
+
+        // 更新学科单元格rowspan
+        function updateSubjectRowspan(type) {
+            const rowClass = type + '-row';
+            const rows = document.querySelectorAll(`.${rowClass}`);
+            const count = rows.length;
+            const firstRow = rows[0];
+            const subjectTd = firstRow.querySelector('.subject-cell');
+            subjectTd.setAttribute('rowspan', count);
+        }
+
+        // 保存图片
+        function saveTableAsImage() {
+            const targetDom = document.getElementById('captureDom');
+            html2canvas(targetDom, {
+                useCORS: true,
+                scale: 2,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = '假期每日学习打卡表.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+    </script>
+</body>
+</html>
